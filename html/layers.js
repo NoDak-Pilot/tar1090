@@ -12,6 +12,120 @@
 //			"url" : "https://{a-c}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png"
 //			"url" : "https://{a-c}.tile.openstreetmap.se/osm/{z}/{x}/{y}.png"
 
+// UND Reporting Points
+const waypointFeatures = [
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.081583, 47.845583])),
+        name: "Billboard"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.113338, 47.906369])),
+        name: "Powerplant"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.031194, 47.991972])),
+        name: "Duster"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.131348, 47.97644])),
+        name: "Lagoon"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.282805, 48.00475])),
+        name: "Kelly Tower"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.2303009, 47.974762])),
+        name: "Kelly Farm"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.270463, 47.831254])),
+        name: "Watergate"
+    }),
+    new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat([-97.218376, 47.890339])),
+        name: "Newman"
+    })
+];
+
+const waypointSource = new ol.source.Vector({
+    features: waypointFeatures
+});
+
+function waypointStyle(feature) {
+    return new ol.style.Style({
+        image: new ol.style.Circle({
+            radius: 4,
+            fill: new ol.style.Fill({ color: "#00AEEF" }),
+            stroke: new ol.style.Stroke({ color: "#fff", width: 2 })
+        }),
+        text: new ol.style.Text({
+            text: feature.get("name"),
+            offsetY: -15,
+            fill: new ol.style.Fill({ color: "#000" }),
+            stroke: new ol.style.Stroke({ color: "#fff", width: 3 })
+        })
+    });
+}
+
+let waypointLayer = new ol.layer.Vector({
+    type: "overlay",
+    title: "VFR Waypoints",
+    name: "undVFRWaypoints",
+    visible: false,
+    zIndex: 100,
+    source: waypointSource,
+    style: waypointStyle
+});
+
+
+function areaStyle(feature) {
+
+    const name = feature.get("name");
+    const available = feature.get("available");
+    const maximum = feature.get("maximum");
+
+    let fillColor = "rgba(200,200,200,0.3)";
+
+    if (available !== undefined && maximum !== undefined) {
+
+        if (maximum === 1) {
+            if (available <= 0) {
+                fillColor = "rgba(255,0,0,0.3)";
+            } else {
+                fillColor = "rgba(0,200,0,0.3)";
+            }
+        } else {
+            if (available <= 0) {
+                fillColor = "rgba(255,0,0,0.3)";
+            } else if (available < 2) {
+                fillColor = "rgba(255,140,0,0.3)";
+            } else {
+                fillColor = "rgba(0,200,0,0.3)";
+            }
+        }
+    }
+
+    return new ol.style.Style({
+        fill: new ol.style.Fill({
+            color: fillColor
+        }),
+        stroke: new ol.style.Stroke({
+            color: "#000",
+            width: 1.5
+        }),
+        text: new ol.style.Text({
+//            text: available !== undefined ? `${name} (${available})` : name,
+            text: available !== undefined ? `${name}` : name,
+            font: "16px sans-serif",
+            fill: new ol.style.Fill({ color: "#000" }),
+            stroke: new ol.style.Stroke({ color: "#fff", width: 3 })
+        })
+    });
+}
+
+window.mapLayers = window.mapLayers || {};
+
 function createBaseLayers() {
     let layers = new ol.Collection();
     let layers_group = new ol.layer.Group({
@@ -21,6 +135,7 @@ function createBaseLayers() {
     let world = new ol.Collection();
     let us = new ol.Collection();
     let europe = new ol.Collection();
+    let undLayers = new ol.Collection();
 
     const tileTransition = onMobile ? 0 : 0;
 
@@ -604,6 +719,84 @@ function createBaseLayers() {
             }
         }
     }));
+
+    // PA MAP STUFF
+    let areaSource = new ol.source.Vector({
+        url: "geojson/areas.geojson",
+        format: new ol.format.GeoJSON({
+            defaultDataProjection: "EPSG:4326",
+            projection: "EPSG:3857"
+        })
+    });
+
+    let areaLayer = new ol.layer.Vector({
+        type: "overlay",
+        title: "Practice Areas VFR",
+        name: "practice_areas_vfr",
+        visible: true,
+        zIndex: 95,
+        source: areaSource,
+        style: areaStyle
+    });
+
+    let areaIFRSource = new ol.source.Vector({
+        url: "geojson/areasIFR.geojson",
+        format: new ol.format.GeoJSON({
+            defaultDataProjection: "EPSG:4326",
+            projection: "EPSG:3857"
+        })
+    });
+
+    let areaIFRLayer = new ol.layer.Vector({
+        type: "overlay",
+        title: "Practice Areas IFR",
+        name: "practice_areas_ifr",
+        visible: false,
+        zIndex: 95,
+        source: areaIFRSource,
+        style: areaStyle
+    });
+
+    async function refreshAreaData() {
+        const res = await fetch("https://aims.nodakpilot.com/pa");
+        const { areas } = await res.json();
+
+        const lookup = Object.fromEntries(areas.map(a => [a.area, a]));
+
+        const applyDataToLayer = (source, layer) => {
+            source.getFeatures().forEach(feature => {
+                const area = lookup[feature.get("name")];
+                if (!area) return;
+
+                feature.set("available", area.available);
+                feature.set("maximum", area.maximum);
+            });
+
+            layer.changed();
+        };
+
+        const updateLayer = (source, layer) => {
+            if (source.getFeatures().length === 0) {
+                source.once("featuresloadend", () => applyDataToLayer(source, layer));
+            } else {
+                applyDataToLayer(source, layer);
+            }
+        };
+
+        updateLayer(areaSource, areaLayer);
+        updateLayer(areaIFRSource, areaIFRLayer);
+    }
+
+    undLayers.push(areaLayer);
+    undLayers.push(areaIFRLayer);
+    undLayers.push(waypointLayer);
+
+    mapLayers.refreshAreaData = refreshAreaData;
+    refreshAreaData();
+//    window.setInterval(refreshAreaData, 60000);
+    if (!timers.refreshAreaData) {
+       timers.refreshAreaData = setInterval(refreshAreaData, 60000);
+    }
 
     // nexrad and noaa stuff
     const bottomLeft = ol.proj.fromLonLat([-171.0,9.0]);
