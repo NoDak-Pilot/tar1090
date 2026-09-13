@@ -25,7 +25,15 @@ dump1090-mutability installations should work as well, aircraft details will be 
 
 ```
 sudo bash -c "$(wget -nv -O - https://github.com/NoDak-Pilot/tar1090/raw/master/install.sh)"
+```
+```
 sudo bash -c "$(wget -nv -O - https://github.com/NoDak-Pilot/tar1090/raw/master/install.sh)" -- /run/readsb webroot
+```
+
+## Remove / Uninstall
+
+```
+sudo bash -c "$(wget -nv -O - https://github.com/wiedehopf/tar1090/raw/master/uninstall.sh)"
 ```
 
 ## View the added webinterface
