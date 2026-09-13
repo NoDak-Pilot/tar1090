@@ -316,7 +316,7 @@ let HideCols = [
 	"#icao",
 //	"#country",
 //	"#flight",
-//	"#route",
+	"#route",
 	"#registration",
 	"#airline",
 //	"#type",
