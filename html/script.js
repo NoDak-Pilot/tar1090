@@ -4139,6 +4139,12 @@ function refreshFeatures() {
         },
         html: flightawareLinks,
         text: 'Callsign' };
+    cols.pa = {
+        text: 'PA',
+        sort: function () { sortBy('pa', compareAlpha, function(x) { return x.pa; }); },
+        value: function(plane) { return plane.practiceArea; },
+        td: '<td class="icaoCodeColumn">',
+    };
     cols.airline = {
         text: 'Airline',
         sort: function () { sortBy('airline', compareAlphaCI, function(x) {
