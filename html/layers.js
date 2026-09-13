@@ -1163,8 +1163,14 @@ function createBaseLayers() {
         }));
     }
 
-
-
+    if (undLayers.getLength() > 0) {
+        layers.push(new ol.layer.Group({
+            name: 'und',
+            title: 'UND',
+            layers: new ol.Collection(undLayers.getArray().reverse()),
+            fold: 'open',
+        }));
+    }
 
     return layers_group;
 }
