@@ -35,6 +35,10 @@ function PlaneObject(icao) {
     this.markerSvgKey = null;
     this.baseScale = 1;
 
+    // AIMS Data
+    this.practiceArea = "A";
+    this.practiceAreaLastUpdate = 0;
+
     // start from a computed registration, let the DB override it
     // if it has something else.
     this.registration = registration_from_hexid(this.icao);
@@ -864,6 +868,10 @@ PlaneObject.prototype.updateIcon = function() {
             } else {
                 callsign += '\n' + this.routeString;
             }
+        }
+
+        if (this.practiceArea) {
+             callsign += ' ' + this.practiceArea;
         }
 
         const unknown = NBSP+NBSP+"?"+NBSP+NBSP;
@@ -2925,6 +2933,62 @@ function normalized_callsign(flight) {
     }
     return alpha + num + alpha2;
 }
+
+function practiceAreaDoLookup() {
+    if (g.practice_area_in_flight) return;
+
+    g.practice_area_in_flight = true;
+
+    jQuery.ajax({
+        type: "GET", // or POST if required
+        url: "https://apipatest.nicolo-taylor.workers.dev/",
+        dataType: 'json',
+    })
+        .done((results) => {
+            const now = Date.now() / 1000;
+            g.practice_area_in_flight = false;
+
+            const seen = new Set();
+
+            for (const result of results) {
+                const icao = result.icao;
+                const plane = g.planes[icao];
+                if (!plane) continue;
+
+                seen.add(icao);
+
+                if (plane.practiceArea !== result.area) {
+                    plane.practiceArea = result.area;
+                    plane.practiceAreaLastUpdate = now;
+
+                    g.practice_area_cache[icao] = {
+                        area: result.area,
+                        timestamp: now
+                    };
+
+                    plane.dataChanged();
+                }
+            }
+
+            // Clear planes that are no longer assigned
+            for (const icao in g.planes) {
+                if (!seen.has(icao)) {
+                    const plane = g.planes[icao];
+                    if (plane.practiceArea !== null) {
+                        plane.practiceArea = null;
+                        plane.dataChanged();
+                    }
+                }
+            }
+
+            refresh();
+        })
+        .fail(() => {
+            g.practice_area_in_flight = false;
+            console.log("Practice area API failed");
+        });
+}
+//setInterval(practiceAreaDoLookup, 60000);
 
 PlaneObject.prototype.routeCheck = function() {
     if (!this.visible) {
