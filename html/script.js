@@ -2172,6 +2172,7 @@ function setIntervalTimers() {
 
     timers.checkMove = setInterval(checkMovement, 50);
     timers.everySecond = setInterval(everySecond, 850);
+    timers.refreshAreaData = setInterval(mapLayers.refreshAreaData, 60000);
 
     //timers.reaper = setInterval(reaper, 40000);
 
