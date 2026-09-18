@@ -3759,6 +3759,28 @@ function refreshSelected() {
     else
         jQuery('#selected_temp').updateText('n/a');
 
+    // AIMS Info if available
+    if (selected.practiceArea != null)
+        jQuery('#aims_data').html(`
+            <div class="sectionTitle">
+              <div class="section-title-content">
+                AIMS Data
+              </div>
+            </div>
+            <div class="infoBlockSection">
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Current aircraft practice area">Source</span>:
+                  </div>
+                  <div class="infoData">
+                    <span id="pa_pa">${selected.practiceArea}</span>
+                  </div>
+                </div>
+                
+            </div>
+        `);
+
     jQuery('#selected_speed1').updateText(format_speed_long(selected.gs, DisplayUnits));
     jQuery('#selected_speed2').updateText(format_speed_long(selected.gs, DisplayUnits));
     jQuery('#selected_ias').updateText(format_speed_long(selected.ias, DisplayUnits));
