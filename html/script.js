@@ -3764,17 +3764,44 @@ function refreshSelected() {
         jQuery('#aims_data').html(`
             <div class="sectionTitle">
               <div class="section-title-content">
-                AIMS Data
+                AIMS DATA
               </div>
             </div>
             <div class="infoBlockSection">
 
                 <div>
                   <div class="infoHeading">
-                    <span title="Current aircraft practice area">Source</span>:
+                    <span title="Current aircraft practice area">Practice Area</span>:
                   </div>
                   <div class="infoData">
                     <span id="pa_pa">${selected.practiceArea}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Aircrafts launch time">Launch Time</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>n/a</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Aircrafts launch return time">Return Time</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>n/a</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Aircrafts logged dispatch time">Dispatch Time</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>n/a</span>
                   </div>
                 </div>
                 
