@@ -3771,7 +3771,7 @@ function refreshSelected() {
 
                 <div>
                   <div class="infoHeading">
-                    <span title="Current aircraft practice area">Practice Area</span>:
+                    <span title="Current aircraft practice area">Practice Areassss</span>:
                   </div>
                   <div class="infoData">
                     <span id="pa_pa">${selected.practiceArea}</span>
