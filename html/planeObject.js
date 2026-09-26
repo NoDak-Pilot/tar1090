@@ -36,7 +36,7 @@ function PlaneObject(icao) {
     this.baseScale = 1;
 
     // AIMS Data
-    this.practiceArea = "A";
+    this.practiceArea = "";
     this.practiceAreaLastUpdate = 0;
 
     // start from a computed registration, let the DB override it
@@ -2943,6 +2943,9 @@ function practiceAreaDoLookup() {
         type: "GET", // or POST if required
         url: "https://apipatest.nicolo-taylor.workers.dev/",
         dataType: 'json',
+        headers: {
+        "Authorization": "Bearer YOUR_TOKEN_HERE"
+    }
     })
         .done((results) => {
             const now = Date.now() / 1000;
@@ -2950,15 +2953,15 @@ function practiceAreaDoLookup() {
 
             const seen = new Set();
 
-            for (const result of results) {
-                const icao = result.icao;
+            for (const result of results.dispatch_events) {
+                const icao = result.hex;
                 const plane = g.planes[icao];
                 if (!plane) continue;
 
                 seen.add(icao);
 
-                if (plane.practiceArea !== result.area) {
-                    plane.practiceArea = result.area;
+                if (plane.practiceArea !== result.practice_area) {
+                    plane.practiceArea = result.practice_area;
                     plane.practiceAreaLastUpdate = now;
 
                     g.practice_area_cache[icao] = {
