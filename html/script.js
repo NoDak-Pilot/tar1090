@@ -185,6 +185,20 @@ let badDotMlat;
 
 let showingReplayBar = false;
 
+function formatAIMSTime(datetime) {
+    if (!datetime) return "n/a";
+
+    const date = new Date(datetime);
+
+    if (isNaN(date.getTime())) return "n/a";
+
+    return date.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    });
+}
+
 function processAircraft(ac, init, uat) {
     const isArray = Array.isArray(ac);
     let hex = isArray ? ac[0] : ac.hex;
@@ -3795,10 +3809,19 @@ function refreshSelected() {
 
                 <div>
                   <div class="infoHeading">
+                    <span title="Aircrafts Flight Type">Type</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>${selected.aims.sched_type ?? "n/a"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
                     <span title="Aircrafts launch time">Launch Time</span>:
                   </div>
                   <div class="infoData">
-                    <span>n/a</span>
+                    <span>${formatAIMSTime(selected.aims.depart_datetime) ?? "n/a"}</span>
                   </div>
                 </div>
 
@@ -3807,7 +3830,7 @@ function refreshSelected() {
                     <span title="Aircrafts launch return time">Return Time</span>:
                   </div>
                   <div class="infoData">
-                    <span>n/a</span>
+                    <span>${formatAIMSTime(selected.aims.return_datetime) ?? "n/a"}</span>
                   </div>
                 </div>
 
@@ -3816,7 +3839,25 @@ function refreshSelected() {
                     <span title="Aircrafts logged dispatch time">Dispatch Time</span>:
                   </div>
                   <div class="infoData">
-                    <span>n/a</span>
+                    <span>${formatAIMSTime(selected.aims.dispatched_datetime) ?? "n/a"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Aircrafts Flight Course">Course</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>${selected.aims.course ?? "n/a"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
+                    <span title="Aircrafts Manifest Note">Manifest</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>${selected.aims.manifest_info ?? "n/a"}</span>
                   </div>
                 </div>
                 
