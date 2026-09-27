@@ -3863,6 +3863,8 @@ function refreshSelected() {
                 
             </div>
         `);
+    else
+        jQuery('#aims_data').html(``);
 
     jQuery('#selected_speed1').updateText(format_speed_long(selected.gs, DisplayUnits));
     jQuery('#selected_speed2').updateText(format_speed_long(selected.gs, DisplayUnits));
