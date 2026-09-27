@@ -20,6 +20,7 @@ function PlaneObject(icao) {
 
     // Track history as a series of line segments
     this.elastic_feature = null;
+    this.heading_feature = null;
     this.track_linesegs = [];
     this.history_size = 0;
     this.trace = []; // save last 30 seconds of positions
@@ -254,6 +255,10 @@ PlaneObject.prototype.isFiltered = function() {
     if (this.selected)
         return false;
 
+    // aiscatcher layer switched off: hide the ships from the table as well
+    if (this.dataSource == 'ais' && g.aiscatcherLayer && !g.aiscatcherLayer.getVisible())
+        return true;
+
     if (noRegOnly && (
         (this.registration || this.icao.startsWith('~'))
         || (this.category && this.category.startsWith('C'))
@@ -266,7 +271,14 @@ PlaneObject.prototype.isFiltered = function() {
     }
 
     for (const filter of filters_active) {
-        if (!this[filter.field] || !this[filter.field].toUpperCase().match(filter.PATTERN)) {
+        const value = this[filter.field];
+        if (!value) {
+            return true;
+        }
+        const index = value.toUpperCase().search(filter.PATTERN);
+        // placeholder names (no callsign / empty callsign) only match from the start (#419)
+        const placeholder = filter.field == 'name' && (value == 'no callsign' || value == 'empty callsign');
+        if (placeholder ? index != 0 : index < 0) {
             //this[filter.field] && console.log(this[filter.field].toUpperCase() + ' ' + filter.PATTERN);
             return true;
         }
@@ -1938,6 +1950,10 @@ PlaneObject.prototype.updateLines = function() {
         this.trail_features.removeFeature(this.elastic_feature);
         this.elastic_feature = null;
     }
+    if (this.heading_feature) {
+        this.trail_features.removeFeature(this.heading_feature);
+        this.heading_feature = null;
+    }
 
     // create any missing fixed line features
 
@@ -2093,6 +2109,25 @@ PlaneObject.prototype.updateLines = function() {
         trail_add.push(this.elastic_feature);
     }
 
+    // dashed line in the direction of travel for the selected aircraft
+    if (headingLineMinutes > 0 && !showTrace && this.selected && !SelectedAllPlanes
+        && this.track != null && this.gs > 0 && this.altitude != "ground" && this.seen_pos < 15) {
+        const distance = this.gs * 1852 / 60 * headingLineMinutes; // knots to meters
+        const end = TAR.utils.geodesic_destination(this.position, this.track * Math.PI / 180, distance);
+        let line = new ol.geom.LineString([this.position, end]);
+        line.transform('EPSG:4326', 'EPSG:3857');
+        this.heading_feature = new ol.Feature(line);
+        this.heading_feature.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({
+                color: monochromeTracks || hslToRgb(altitudeColor(this.altitude)),
+                width: newWidth,
+                lineDash: [4 * newWidth, 6 * newWidth],
+            })
+        }));
+        this.heading_feature.hex = this.icao;
+        trail_add.push(this.heading_feature);
+    }
+
 
     if (trail_add.length > 0)
         this.trail_features.addFeatures(trail_add);
@@ -2118,6 +2153,7 @@ PlaneObject.prototype.removeTrail = function() {
         delete this.track_linesegs[i].label;
     }
     this.elastic_feature = null;
+    this.heading_feature = null;
 };
 
 // This is to remove the line from the screen if we deselect the plane
