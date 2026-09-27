@@ -6,6 +6,7 @@
 "use strict";
 
 g.planes        = {};
+g.aims_aircraft = {};
 g.planesOrdered = [];
 g.route_cache = [];
 g.route_check_todo = {};
