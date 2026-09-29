@@ -5698,6 +5698,18 @@ function initFilters() {
     initSourceFilter(tableColors.unselected);
     initFlagFilter(tableColors.unselected);
     new Filter({
+        key: 'practiceArea',
+        field: 'aims.practice_area',
+        name: 'Practice Area',
+        table: "filterTable",
+    });
+    new Filter({
+        key: 'callsign',
+        field: 'name',
+        name: 'callsign',
+        table: "filterTable",
+    });
+    new Filter({
         key: 'callsign',
         field: 'name',
         name: 'callsign',
