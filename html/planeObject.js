@@ -38,12 +38,14 @@ function PlaneObject(icao) {
     // AIMS Data
     this.aims = {};
     this.practiceArea = null;
+    this.dueback_datetime = null;
     this.aimsLastUpdate = 0;
 
     const aimsData = g.aims_aircraft[icao];
     if (aimsData) {
         this.aims = aimsData;
         this.practiceArea = aimsData.practice_area;
+        this.dueback_datetime = new Date(new Date(aimsData.return_datetime).getTime() - 1000 * 60 * 15);
         this.aimsLastUpdate = aimsData.timestamp;
     }
 
