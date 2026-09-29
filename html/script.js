@@ -5699,7 +5699,7 @@ function initFilters() {
     initFlagFilter(tableColors.unselected);
     new Filter({
         key: 'practiceArea',
-        field: 'aims.practice_area',
+        field: 'practiceArea',
         name: 'Practice Area',
         table: "filterTable",
     });
