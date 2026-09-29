@@ -45,6 +45,7 @@ function PlaneObject(icao) {
         this.aims = aimsData;
         this.practiceArea = aimsData.practice_area;
         this.aimsLastUpdate = aimsData.timestamp;
+        this.dueback_datetime = Date(aims.return_datetime.getTime() - 1000 * 15)
     }
 
     // start from a computed registration, let the DB override it
