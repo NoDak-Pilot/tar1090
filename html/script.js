@@ -3818,6 +3818,15 @@ function refreshSelected() {
 
                 <div>
                   <div class="infoHeading">
+                    <span title="Aircrafts logged dispatch time">Dispatch Time</span>:
+                  </div>
+                  <div class="infoData">
+                    <span>${formatAIMSTime(selected.aims.dispatched_datetime) ?? "n/a"}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="infoHeading">
                     <span title="Aircrafts launch time">Launch Time</span>:
                   </div>
                   <div class="infoData">
@@ -3830,16 +3839,7 @@ function refreshSelected() {
                     <span title="Aircrafts launch return time">Return Time</span>:
                   </div>
                   <div class="infoData">
-                    <span>${formatAIMSTime(selected.aims.return_datetime) ?? "n/a"}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <div class="infoHeading">
-                    <span title="Aircrafts logged dispatch time">Dispatch Time</span>:
-                  </div>
-                  <div class="infoData">
-                    <span>${formatAIMSTime(selected.aims.dispatched_datetime) ?? "n/a"}</span>
+                    <span>${formatAIMSTime(selected.dueback_datetime) ?? "n/a"}</span>
                   </div>
                 </div>
 
