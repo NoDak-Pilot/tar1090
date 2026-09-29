@@ -37,7 +37,7 @@ function PlaneObject(icao) {
 
     // AIMS Data
     this.aims = {};
-    this.practiceArea = "";
+    this.practiceArea = null;
     this.aimsLastUpdate = 0;
 
     const aimsData = g.aims_aircraft[icao];
