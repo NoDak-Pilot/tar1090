@@ -45,7 +45,6 @@ function PlaneObject(icao) {
         this.aims = aimsData;
         this.practiceArea = aimsData.practice_area;
         this.aimsLastUpdate = aimsData.timestamp;
-        this.dueback_datetime = new Date(new Date(this.aims.return_datetime).getTime() - 1000 * 60 * 15);
     }
 
     // start from a computed registration, let the DB override it
@@ -2985,8 +2984,8 @@ function practiceAreaDoLookup() {
             if (plane) {
                 plane.aims = result;
                 plane.practiceArea = result.practice_area;
+                plane.dueback_datetime = new Date(new Date(result.return_datetime).getTime() - 1000 * 60 * 15);
                 plane.aimsLastUpdate = now;
-
                 plane.dataChanged();
             }
         }
